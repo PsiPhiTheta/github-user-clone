@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Author: Thomas Hollis (inspired from https://gist.github.com/milanboers/f34cdfc3e1ad9ba02ee8e44dae8e093f)
+# Date: 01/09/2019
+# Purpose: Clone all github.com repositories for a specified user and compresses them to .zip
+
+# 0. Housekeeping
+if [ $# -eq 0 ]
+  then
+    echo "Usage: $0 <user_name> "
+    exit;
+fi
+
+folderprefix="github-user-clone"
+USER=$1
+now=$(date +"%d-%m-%Y")
+foldername="$folderprefix-$USER-$now"
+zipname="$foldername.zip"
+
+# 1. Create directory for backup
+cd ~
+cd Downloads/
+mkdir $foldername
+cd $foldername
+
+# 2. Clone all repositories for user specifed (note: does not include private repositories)
+for repo in `curl -s https://api.github.com/users/$USER/repos?per_page=1000 |grep git_url |awk '{print $2}'| sed 's/"\(.*\)",/\1/'`;do
+git clone $repo;
+done;
+
+cd ..
+
+# 3. Zip and remove originals
+zip -rm $zipname $foldername
+
+# 4. Output message confirmation
+echo "Backup task completed succesffuly."
