@@ -32,6 +32,3 @@ cd ..
 
 # 3. Zip and remove originals
 zip -rm $zipname $foldername
-
-# 4. Output message confirmation
-echo "Backup task completed succesffuly."
